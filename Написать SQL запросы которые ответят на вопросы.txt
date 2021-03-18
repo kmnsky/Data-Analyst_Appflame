@@ -1,0 +1,15 @@
+1. Общие расходы и доходы  по дням привлечения трафика
+SELECT User_id, Date_Reg, SUM(sum_out), SUM(sum_inc)
+FROM( SELECT User_id, Date_Reg, SUM(CPR) as sum_inc, null as sum_out 
+FROM Table_Users GROUP BY User_id, Date_Reg
+UNION
+SELECT User_id, Date_Reg, null as sum_inc, SUM(LTV) as sum_out 
+FROM Table_Users GROUP BY User_id, Date_Reg ) as t
+GROUP BY User_id, Date_Reg ORDER BY User_id
+
+
+2. Динамика количества регистраций к предыдущему дню в процентах
+SELECT Date_Reg,
+       100.0 * COUNT(*) / LAG(COUNT(*)) OVER (ORDER BY Date_Reg) - 100 AS Growth_Percentage
+FROM Table_Users
+GROUP BY Date_Reg
